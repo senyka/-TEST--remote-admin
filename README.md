@@ -1,29 +1,29 @@
 # RemAdm - Remote Desktop Access
 
-A self-hosted alternative to DWService providing secure remote desktop access through WebRTC.
+A self-hosted providing secure remote desktop access through WebRTC.
 
 ## 🏗️ Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Web Frontend                          │
-│  ┌─────────────────────────────────────────┐           │
-│  │ React + TypeScript + WebRTC API         │           │
-│  │ • Device dashboard                      │           │
-│  │ • WebRTC viewer + input handler         │           │
-│  └─────────────────────────────────────────┘           │
+│                    Web Frontend                         │
+│  ┌─────────────────────────────────────────┐            │
+│  │ React + TypeScript + WebRTC API         │            │
+│  │ • Device dashboard                      │            │
+│  │ • WebRTC viewer + input handler         │            │
+│  └─────────────────────────────────────────┘            │
 └─────────────────┬───────────────────────────────────────┘
                   │ HTTPS / WSS
                   ▼
 ┌─────────────────────────────────────────────────────────┐
-│                 Signaling Server (Go)                    │
-│  ┌─────────────────────────────────────────┐           │
-│  │ Go + Pion WebRTC + WebSocket            │           │
-│  │ • Agent registration                    │           │
-│  │ • ICE/STUN coordination                 │           │
-│  │ • Session routing                       │           │
-│  │ • PostgreSQL + Redis                    │           │
-│  └─────────────────────────────────────────┘           │
+│                 Signaling Server (Go)                   │
+│  ┌─────────────────────────────────────────┐            │
+│  │ Go + Pion WebRTC + WebSocket            │            │
+│  │ • Agent registration                    │            │
+│  │ • ICE/STUN coordination                 │            │
+│  │ • Session routing                       │            │
+│  │ • PostgreSQL + Redis                    │            │
+│  └─────────────────────────────────────────┘            │
 └─────────────────┬───────────────────────────────────────┘
                   │ WebSocket / WebRTC
         ┌─────────┴─────────┐
