@@ -4,9 +4,9 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: dwservice-db
+    container_name: remadm-db
     environment:
-      POSTGRES_DB: dwservice
+      POSTGRES_DB: remadm
       POSTGRES_USER: dwservice
       POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     volumes:
@@ -23,12 +23,12 @@ services:
   # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: dwservice-redis
+    container_name: remadm-redis
     command: redis-server --requirepass ${REDIS_PASSWORD:-changeme}
     volumes:
       - redis_data:/data
     networks:
-      - dwservice-network
+      - remadm-network
     healthcheck:
       test: ["CMD", "redis-cli", "--pass", "${REDIS_PASSWORD:-changeme}", "ping"]
       interval: 10s
@@ -40,7 +40,7 @@ services:
     build:
       context: ../signaling
       dockerfile: ../docker/Dockerfile.signaling
-    container_name: dwservice-signaling
+    container_name: remadm-signaling
     depends_on:
       postgres:
         condition: service_healthy
@@ -49,13 +49,13 @@ services:
     ports:
       - "8443:8443"
     environment:
-      DATABASE_URL: postgres://dwservice:${DB_PASSWORD:-changeme}@postgres/dwservice?sslmode=disable
+      DATABASE_URL: postgres://remadmdb:${DB_PASSWORD:-changeme}@postgres/remadmdb?sslmode=disable
       REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379
       ALLOWED_ORIGINS: https://localhost:3000,https://your-domain.com
     volumes:
       - ./certs:/app/certs:ro
     networks:
-      - dwservice-network
+      - remadm-network
     restart: unless-stopped
 
   # Frontend (optional - can be served via CDN)
@@ -63,13 +63,13 @@ services:
     build:
       context: ../frontend
       dockerfile: ../docker/Dockerfile.frontend
-    container_name: dwservice-frontend
+    container_name: remadm-frontend
     depends_on:
       - signaling
     ports:
       - "3000:80"
     networks:
-      - dwservice-network
+      - remadm-network
     restart: unless-stopped
 
 volumes:
