@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/yourorg/dwservice-clone/signaling/internal/handler"
-	"github.com/yourorg/dwservice-clone/signaling/internal/store"
+	"github.com/senyka/-TEST--remote-admin/tree/main/signaling/internal/handler"
+	"github.com/senyka/-TEST--remote-admin/tree/main/signaling/internal/store"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 	addr := flag.String("addr", ":8443", "HTTPS listen address")
 	certFile := flag.String("cert", "cert.pem", "TLS certificate file")
 	keyFile := flag.String("key", "key.pem", "TLS key file")
-	dbDSN := flag.String("db", "postgres://user:pass@localhost/dwservice?sslmode=disable", "PostgreSQL DSN")
+	dbDSN := flag.String("db", "postgres://user:pass@localhost/remadmbd?sslmode=disable", "PostgreSQL DSN")
 	redisAddr := flag.String("redis", "localhost:6379", "Redis address")
 	flag.Parse()
 
