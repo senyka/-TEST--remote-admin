@@ -79,7 +79,7 @@ A self-hosted providing secure remote desktop access through WebRTC.
 
 ```bash
 # PostgreSQL
-createdb dwservice
+createdb remadmdb
 
 # Redis (ensure it's running)
 redis-server
@@ -96,7 +96,7 @@ go build -o signaling ./cmd/signaling
 openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
 
 # Run server
-./signaling -addr :8443 -db "postgres://localhost/dwservice?sslmode=disable" -redis localhost:6379
+./signaling -addr :8443 -db "postgres://localhost/remadmdb?sslmode=disable" -redis localhost:6379
 ```
 
 ### 3. Build Agent
