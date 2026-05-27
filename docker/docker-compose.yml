@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: dwservice-db
+    environment:
+      POSTGRES_DB: dwservice
+      POSTGRES_USER: dwservice
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - dwservice-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dwservice"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: dwservice-redis
+    command: redis-server --requirepass ${REDIS_PASSWORD:-changeme}
+    volumes:
+      - redis_data:/data
+    networks:
+      - dwservice-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--pass", "${REDIS_PASSWORD:-changeme}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Signaling Server
+  signaling:
+    build:
+      context: ../signaling
+      dockerfile: ../docker/Dockerfile.signaling
+    container_name: dwservice-signaling
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8443:8443"
+    environment:
+      DATABASE_URL: postgres://dwservice:${DB_PASSWORD:-changeme}@postgres/dwservice?sslmode=disable
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379
+      ALLOWED_ORIGINS: https://localhost:3000,https://your-domain.com
+    volumes:
+      - ./certs:/app/certs:ro
+    networks:
+      - dwservice-network
+    restart: unless-stopped
+
+  # Frontend (optional - can be served via CDN)
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    container_name: dwservice-frontend
+    depends_on:
+      - signaling
+    ports:
+      - "3000:80"
+    networks:
+      - dwservice-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  dwservice-network:
+    driver: bridge
