@@ -7,15 +7,15 @@ services:
     container_name: remadm-db
     environment:
       POSTGRES_DB: remadm
-      POSTGRES_USER: dwservice
+      POSTGRES_USER: remadm
       POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme}
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
-      - dwservice-network
+      - remadm-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U dwservice"]
+      test: ["CMD-SHELL", "pg_isready -U remadm"]
       interval: 10s
       timeout: 5s
       retries: 5
