@@ -1,4 +1,4 @@
-module github.com/yourorg/dwservice-clone/signaling
+module github.com/senyka/-TEST--remote-admin/tree/main/signaling/
 
 go 1.21
 
