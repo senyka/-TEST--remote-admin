@@ -1,0 +1,59 @@
+[package]
+name = "dwservice-agent"
+version = "0.1.0"
+edition = "2021"
+description = "Remote desktop agent for DWService clone - cross-platform screen capture and input simulation"
+authors = ["Your Org <your@email.com>"]
+
+[dependencies]
+# Screen capture
+xcap = "0.1.4"
+scap = "0.5.1"
+
+# WebSocket client
+tungstenite = "0.21"
+tokio-tungstenite = "0.21"
+
+# Async runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Input simulation
+rdev = "0.5"
+
+# Clipboard access
+arboard = "3.3"
+
+# Logging
+log = "0.4"
+env_logger = "0.10"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# UUID for device ID
+uuid = { version = "1.6", features = ["v4"] }
+
+# Configuration
+config = "0.14"
+
+# Native TLS
+native-tls = "0.2"
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["winuser", "shellapi"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+core-graphics = "0.23"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+x11rb = { version = "0.13", features = ["allow-unsafe-code"] }
+
+[profile.release]
+opt-level = 3
+lto = true
+strip = true
