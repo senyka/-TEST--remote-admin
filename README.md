@@ -1,27 +1,29 @@
-# RemAdm - Remote Desktop Access
+# RemAdm — Удалённое управление рабочим столом
 
-A self-hosted providing secure remote desktop access through WebRTC.
+Самостоятельно разворачиваемое решение для безопасного удалённого доступа к рабочему столу через WebRTC.
 
-## 🏗️ Architecture
+---
+
+## 🏗️ Архитектура
 
 ```
 ┌───────────────────────────────────────────────┐
-│                    Web Frontend               │
+│              Веб-интерфейс                    │
 │  ┌─────────────────────────────────────────┐  │
 │  │ React + TypeScript + WebRTC API         │  │
-│  │ • Device dashboard                      │  │
-│  │ • WebRTC viewer + input handler         │  │
+│  │ • Панель управления устройствами        │  │
+│  │ • WebRTC-просмотрщик + обработчик ввода │  │
 │  └─────────────────────────────────────────┘  │
 └─────────────────┬─────────────────────────────┘
                   │ HTTPS / WSS
                   ▼
 ┌───────────────────────────────────────────────┐
-│                 Signaling Server (Go)         │
+│          Сигнальный сервер (Go)               │
 │  ┌─────────────────────────────────────────┐  │
 │  │ Go + Pion WebRTC + WebSocket            │  │
-│  │ • Agent registration                    │  │
-│  │ • ICE/STUN coordination                 │  │
-│  │ • Session routing                       │  │
+│  │ • Регистрация агентов                   │  │
+│  │ • Координация ICE/STUN                  │  │
+│  │ • Маршрутизация сессий                  │  │
 │  │ • PostgreSQL + Redis                    │  │
 │  └─────────────────────────────────────────┘  │
 └─────────────────┬─────────────────────────────┘
@@ -29,166 +31,184 @@ A self-hosted providing secure remote desktop access through WebRTC.
         ┌─────────┴─────────┐
         ▼                   ▼
 ┌───────────────┐ ┌─────────────────┐
-│   Agent       │ │   Browser       │
-│  (Rust)       │ │   Client        │
-│ • Screen cap  │ │ • Display video │
-│ • Input hook  │ │ • Send input    │
-│ • Clipboard   │ │                 │
+│     Агент     │ │    Браузер      │
+│    (Rust)     │ │    клиент       │
+│ • Захват экран│ │ • Отображение   │
+│ • Перехват    │ │   видео         │
+│   ввода       │ │ • Отправка      │
+│ • Буфер       │ │   ввода         │
+│   обмена      │ │                 │
 └───────────────┘ └─────────────────┘
 ```
 
-## 📦 Components
+---
 
-### 1. Signaling Server (Go)
-- **Location**: `/signaling`
-- **Tech Stack**: Go, Pion WebRTC, Gorilla WebSocket, PostgreSQL, Redis
-- **Features**:
-  - WebSocket-based signaling for WebRTC
-  - Device registration and session management
-  - ICE candidate exchange
-  - Session cleanup and heartbeat monitoring
+## 📦 Компоненты
 
-### 2. Agent (Rust)
-- **Location**: `/agent`
-- **Tech Stack**: Rust, scap (screen capture), rdev (input simulation)
-- **Features**:
-  - Cross-platform screen capture (Windows, macOS, Linux)
-  - Mouse and keyboard input simulation
-  - Clipboard synchronization
-  - WebSocket connection to signaling server
+### 1. Сигнальный сервер (Go)
 
-### 3. Web Frontend (React)
-- **Location**: `/frontend`
-- **Tech Stack**: React, TypeScript, Vite, native WebRTC API
-- **Features**:
-  - Device dashboard with online/offline status
-  - WebRTC video streaming
-  - Real-time input handling (mouse, keyboard, clipboard)
-  - Connection status monitoring
+- **Расположение**: `/signaling`
+- **Стек**: Go, Pion WebRTC, Gorilla WebSocket, PostgreSQL, Redis
+- **Возможности**:
+  - WebRTC-сигналинг через WebSocket
+  - Регистрация устройств и управление сессиями
+  - Обмен ICE-кандидатами
+  - Очистка сессий и мониторинг активности (heartbeat)
 
-## 🚀 Quick Start
+### 2. Агент (Rust)
 
-### Prerequisites
+- **Расположение**: `/agent`
+- **Стек**: Rust, scap (захват экрана), rdev (эмуляция ввода)
+- **Возможности**:
+  - Кроссплатформенный захват экрана (Windows, macOS, Linux)
+  - Эмуляция мыши и клавиатуры
+  - Синхронизация буфера обмена
+  - Подключение к сигнальному серверу по WebSocket
+
+### 3. Веб-интерфейс (React)
+
+- **Расположение**: `/frontend`
+- **Стек**: React, TypeScript, Vite, нативный WebRTC API
+- **Возможности**:
+  - Панель устройств со статусом онлайн/офлайн
+  - WebRTC-видеотрансляция
+  - Обработка ввода в реальном времени (мышь, клавиатура, буфер обмена)
+  - Мониторинг состояния подключения
+
+---
+
+## 🚀 Быстрый старт
+
+### Требования
+
 - Go 1.21+
 - Rust 1.70+
 - Node.js 18+
 - PostgreSQL 14+
 - Redis 7+
 
-### 1. Setup Database
+### 1. Настройка базы данных
 
 ```bash
 # PostgreSQL
 createdb remadmdb
 
-# Redis (ensure it's running)
+# Redis (убедитесь, что сервер запущен)
 redis-server
 ```
 
-### 2. Build Signaling Server
+### 2. Сборка сигнального сервера
 
 ```bash
 cd signaling
 go mod download
 go build -o signaling ./cmd/signaling
 
-# Generate self-signed certificate for development
+# Самоподписанный сертификат для разработки
 openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
 
-# Run server
+# Запуск сервера
 ./signaling -addr :8443 -db "postgres://localhost/remadmdb?sslmode=disable" -redis localhost:6379
 ```
 
-### 3. Build Agent
+### 3. Сборка агента
 
 ```bash
 cd agent
 cargo build --release
 
-# Run agent (replace DEVICE_ID with your device identifier)
+# Запуск агента (замените DEVICE_ID на идентификатор вашего устройства)
 DEVICE_ID=my-device-001 SIGNALING_URL=wss://localhost:8443/ws cargo run --release
 ```
 
-### 4. Start Frontend
+### 4. Запуск веб-интерфейса
 
 ```bash
 cd frontend
 npm install
 npm run dev
 
-# Open http://localhost:3000 in browser
+# Откройте http://localhost:3000 в браузере
 ```
 
-## 🔐 Security Features
+---
 
-1. **TLS 1.3** for all connections (HTTPS, WSS, DTLS-SRTP)
-2. **End-to-end encryption** via WebRTC
-3. **Device authentication** with unique IDs
-4. **Session management** with automatic cleanup
-5. **CORS protection** on signaling server
-6. **Input validation** on all endpoints
+## 🔐 Безопасность
 
-## 🛠️ Configuration
+1. **TLS 1.3** для всех соединений (HTTPS, WSS, DTLS-SRTP)
+2. **Сквозное шифрование** через WebRTC
+3. **Аутентификация устройств** по уникальным идентификаторам
+4. **Управление сессиями** с автоматической очисткой
+5. **Защита CORS** на сигнальном сервере
+6. **Валидация ввода** на всех эндпоинтах
 
-### Signaling Server Flags
+---
 
-```
--addr       HTTPS listen address (default: :8443)
--cert       TLS certificate file (default: cert.pem)
--key        TLS key file (default: key.pem)
--db         PostgreSQL DSN
--redis      Redis address (default: localhost:6379)
-```
+## ⚙️ Конфигурация
 
-### Agent Environment Variables
+### Флаги сигнального сервера
 
-```
-DEVICE_ID         Unique device identifier
-SIGNALING_URL     WebSocket URL of signaling server
-```
+| Флаг | Описание | По умолчанию |
+|------|----------|--------------|
+| `-addr` | Адрес HTTPS | `:8443` |
+| `-cert` | Файл TLS-сертификата | `cert.pem` |
+| `-key` | Файл TLS-ключа | `key.pem` |
+| `-db` | DSN PostgreSQL | — |
+| `-redis` | Адрес Redis | `localhost:6379` |
 
-## 📝 Development
+### Переменные окружения агента
 
-### Running Tests
+| Переменная | Описание |
+|------------|----------|
+| `DEVICE_ID` | Уникальный идентификатор устройства |
+| `SIGNALING_URL` | WebSocket-адрес сигнального сервера |
+
+---
+
+## 🛠️ Разработка
+
+### Запуск тестов
 
 ```bash
-# Signaling server
+# Сигнальный сервер
 cd signaling && go test ./...
 
-# Agent
+# Агент
 cd agent && cargo test
 
-# Frontend
+# Веб-интерфейс
 cd frontend && npm test
 ```
 
-### Building for Production
+### Сборка для продакшена
 
 ```bash
-# Signaling server
+# Сигнальный сервер
 cd signaling
 go build -ldflags="-s -w" -o signaling ./cmd/signaling
 
-# Agent
+# Агент
 cd agent
 cargo build --release
 
-# Frontend
+# Веб-интерфейс
 cd frontend
 npm run build
 ```
 
-## 📄 License
+---
 
-MIT License - see LICENSE file for details
+## 📄 Лицензия
 
-## 🤝 Contributing
+MIT License — подробности в файле LICENSE.
 
-Contributions are welcome! Please read our contributing guidelines before submitting PRs.
+## 🤝 Участие в проекте
 
-## 🙏 Acknowledgments
+PR и предложения приветствуются! Ознакомьтесь с руководством по участию перед отправкой.
 
-- [Pion WebRTC](https://github.com/pion/webrtc) - Pure Go WebRTC implementation
-- [scap](https://github.com/waydab/scap) - Cross-platform screen capture
-- [rdev](https://github.com/NicolasConstant/rdev) - Input simulation library
-- [DWService](https://www.dwservice.net/) - Inspiration for this project
+## 🙏 Благодарности
+
+- [Pion WebRTC](https://github.com/pion/webrtc) — чистая Go-реализация WebRTC
+- [scap](https://github.com/s1lviu/scap) — кроссплатформенный захват экрана
+- [rdev](https://github.com/Narsil/rdev) — библиотека эмуляции ввода
+- [DWService](https://www.dwservice.net/) — вдохновение для проекта
