@@ -10,7 +10,7 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/pion/webrtc/v3"
-	"github.com/yourorg/dwservice-clone/signaling/internal/store"
+	"github.com/senyka/-TEST--remote-admin/tree/main/signaling/internal/store"
 )
 
 // SignalMessage represents a WebSocket signaling message
