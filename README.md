@@ -1,4 +1,4 @@
-# DWService Clone - Remote Desktop Access
+# RemAdm - Remote Desktop Access
 
 A self-hosted alternative to DWService providing secure remote desktop access through WebRTC.
 
