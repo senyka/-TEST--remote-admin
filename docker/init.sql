@@ -1,4 +1,4 @@
--- Initialize DWService database schema
+-- Initialize RemAdm database schema
 
 -- Devices table
 CREATE TABLE IF NOT EXISTS devices (
@@ -55,5 +55,5 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at);
 
 -- Grant permissions (adjust as needed)
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO dwservice;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO dwservice;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO remadmdb;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO remadmdb;
