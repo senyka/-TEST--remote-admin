@@ -1,8 +1,8 @@
 [package]
-name = "dwservice-agent"
+name = "remadm-agent"
 version = "0.1.0"
 edition = "2021"
-description = "Remote desktop agent for DWService clone - cross-platform screen capture and input simulation"
+description = "Remote desktop agent - cross-platform screen capture and input simulation"
 authors = ["Your Org <your@email.com>"]
 
 [dependencies]
